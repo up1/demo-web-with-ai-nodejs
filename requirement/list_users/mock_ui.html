@@ -1,0 +1,861 @@
+<!DOCTYPE html><html lang="th" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="web_dashboard" name="shell-type">
+<title>AuthShield - จัดการผู้ใช้งาน (User Directory)</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+    }
+    .material-symbols-outlined.fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              500: '#0f172a',
+              900: '#020617',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#fafafa] text-[#0f172a] antialiased selection:bg-slate-100 selection:text-slate-900">
+<!-- Minimal Sidebar Shell -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-200/80 z-50 flex flex-col justify-between">
+<div class="flex flex-col flex-1 min-h-0">
+<!-- Logo Branding -->
+<div class="h-16 px-6 flex items-center gap-3 border-b border-slate-100">
+<div class="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm">
+          AS
+        </div>
+<div class="flex flex-col min-w-0">
+<span class="text-sm font-semibold tracking-tight text-slate-900 leading-none">AuthShield</span>
+<span class="text-[10px] uppercase font-mono tracking-wider text-slate-400 mt-1">Enterprise IAM</span>
+</div>
+</div>
+<!-- System Status Bar -->
+
+<!-- Navigation Links -->
+<nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+<div>
+<div class="px-3 pb-2 text-[10px] font-semibold text-slate-400 uppercase tracking-widest font-mono">
+            การจัดการตัวตนและสิทธิ์
+          </div>
+<div class="space-y-0.5">
+<a aria-current="page" class="group flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-900 rounded-md bg-slate-100 transition-colors" data-path="user-directory" href="#">
+<span class="material-symbols-outlined text-[18px] text-slate-900">group</span>
+<span class="">จัดการผู้ใช้งาน</span>
+</a>
+<a class="group flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-md transition-colors" data-path="add-user-and-permissions" href="#">
+<span class="material-symbols-outlined text-[18px] text-slate-400 group-hover:text-slate-700">person_add</span>
+<span class="">สร้างผู้ใช้และสิทธิ์</span>
+</a>
+<a class="group flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-md transition-colors" data-path="roles-and-access-matrix" href="#">
+<span class="material-symbols-outlined text-[18px] text-slate-400 group-hover:text-slate-700">admin_panel_settings</span>
+<span class="">บทบาทและกลุ่มสิทธิ์</span>
+</a>
+</div>
+</div>
+<div>
+<div class="px-3 pb-2 text-[10px] font-semibold text-slate-400 uppercase tracking-widest font-mono">
+            ความปลอดภัยและการกำกับดูแล
+          </div>
+<div class="space-y-0.5">
+<a class="group flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-md transition-colors" data-path="audit-logs-and-security" href="#">
+<span class="material-symbols-outlined text-[18px] text-slate-400 group-hover:text-slate-700">receipt_long</span>
+<span class="">ประวัติการใช้งาน</span>
+</a>
+<a class="group flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-md transition-colors" data-path="system-settings" href="#">
+<span class="material-symbols-outlined text-[18px] text-slate-400 group-hover:text-slate-700">tune</span>
+<span class="">การตั้งค่าระบบ</span>
+</a>
+</div>
+</div>
+</nav>
+</div>
+<!-- Tenant Meta Footer -->
+<div class="p-4 border-t border-slate-200/80 bg-white">
+
+</div>
+</aside>
+<!-- Main Content Layout -->
+<div class="pl-64">
+<!-- Clean Minimal Header -->
+<header class="sticky top-0 h-16 bg-white/80 backdrop-blur border-b border-slate-200/80 z-40 px-8 flex items-center justify-between">
+<div class="flex items-center gap-3 w-full max-w-md">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+<input class="w-full pl-9 pr-12 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-normal" placeholder="ค้นหาผู้ใช้งาน, อีเมล, แผนก, หรือ Role... [⌘K]" type="text">
+<kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-[10px] font-mono bg-white border border-slate-200 text-slate-400">⌘K</kbd>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors" data-path="add-user-and-permissions" href="#">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span class="">สร้างผู้ใช้ใหม่</span>
+</a>
+<button aria-label="Notifications" class="relative p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+</button>
+<div class="h-4 w-[1px] bg-slate-200 mx-1"></div>
+<div class="flex items-center gap-2.5 pl-1 cursor-pointer">
+<div class="relative">
+<img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBasuIZLGLTiodOOsuI2gDits0oCM2_VyHJHyuzfETTOgXVDEgZEsf8MPukBEbrXwXJfOk3VUON4G7xs-qooYb7XQIrkms9du6ekeIYyV3VpP8_pNYwPeGrYGM5jXOaqpjXE3f5z8XLarhVu5EL7Y320SJudhp6Ra71zqVLg3tmrY5qxQGktdwcL6RTiPHlH2vkNiSEHZ3wohzB6ln0Y6vzeOUKs4J99SW27OmfgW4O3wLqkxiWy9hWsg">
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="flex flex-col text-left">
+<span class="text-xs font-semibold text-slate-900 leading-tight">ธนภัทร สุวรรณเวช</span>
+<span class="text-[10px] text-slate-400 font-medium">Super Admin</span>
+</div>
+<span class="material-symbols-outlined text-slate-400 text-[18px]">expand_more</span>
+</div>
+</div>
+</header>
+<!-- Page Body -->
+<main class="p-8 space-y-6 max-w-[1600px] mx-auto">
+<!-- Title & Action Bar -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+<div class="space-y-1">
+<div class="flex items-center gap-2.5">
+<h1 class="text-xl font-bold text-slate-900 tracking-tight">จัดการผู้ใช้งาน (User Directory)</h1>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium border border-slate-200/60 font-mono">
+              1,248 ผู้ใช้งานทั้งหมด
+            </span>
+</div>
+<p class="text-xs text-slate-500 max-w-2xl leading-relaxed">
+            บริหารจัดการบัญชีผู้ใช้ สถานะการเข้าใช้งาน สิทธิ์ระดับองค์กร นโยบายความปลอดภัย และรีเซ็ตรหัสผ่านพนักงาน
+          </p>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-medium transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px] text-slate-400">file_download</span>
+<span class="">ส่งออกข้อมูล (Export)</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-medium transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px] text-slate-400">upload_file</span>
+<span class="">นำเข้าผู้ใช้ (Bulk Import)</span>
+</button>
+<a class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors shadow-sm" data-path="add-user-and-permissions" href="#">
+<span class="material-symbols-outlined text-[16px]">person_add</span>
+<span class="">+ เพิ่มผู้ใช้งานใหม่</span>
+</a>
+</div>
+</div>
+<!-- Clean KPI Metric Panels (Slim Dividers, Minimalist Surface) -->
+<div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+<!-- Stat 1 -->
+<div class="sm:px-6 first:pl-0 space-y-2 py-2 sm:py-0">
+<div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+<span class="">ผู้ใช้งานที่ใช้งานอยู่ (Active Users)</span>
+<span class="material-symbols-outlined text-emerald-600 text-[18px]">check_circle</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold tracking-tight text-slate-900 font-mono">1,180</span>
+<span class="inline-flex items-center text-[11px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                +12 สัปดาห์นี้
+              </span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+<span class="">94.5% ของบัญชีที่ลงทะเบียน</span>
+<span class="font-mono text-slate-600">94.5%</span>
+</div>
+</div>
+<!-- Stat 2 -->
+<div class="sm:px-6 space-y-2 py-4 sm:py-0">
+<div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+<span class="">รอการเปิดใช้งาน (Pending)</span>
+<span class="material-symbols-outlined text-slate-400 text-[18px]">mail_outline</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold tracking-tight text-slate-900 font-mono">45</span>
+<span class="text-xs text-slate-500">ส่งคำเชิญแล้ว</span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+<span class="">หมดอายุอัตโนมัติภายใน 48 ชม.</span>
+<span class="font-mono text-slate-600">3.6%</span>
+</div>
+</div>
+<!-- Stat 3 -->
+<div class="sm:px-6 space-y-2 py-4 sm:py-0">
+<div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+<span class="">ระงับการใช้งาน (Suspended)</span>
+<span class="material-symbols-outlined text-rose-500 text-[18px]">block</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold tracking-tight text-slate-900 font-mono">23</span>
+<span class="inline-flex items-center text-[11px] font-medium text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">
+                ล็อคอัตโนมัติ
+              </span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+<span class="">ติดนโยบายความปลอดภัย / ลาออก</span>
+<span class="font-mono text-slate-600">1.8%</span>
+</div>
+</div>
+<!-- Stat 4 -->
+<div class="sm:px-6 last:pr-0 space-y-2 py-4 sm:py-0">
+<div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+<span class="">ผู้ดูแลระบบและสิทธิ์พิเศษ (Admins)</span>
+<span class="material-symbols-outlined text-slate-700 text-[18px]">shield_person</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold tracking-tight text-slate-900 font-mono">18</span>
+<span class="inline-flex items-center text-[11px] font-medium text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded font-mono">
+                2FA 100%
+              </span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+<span class="truncate">Root / Super Admin / Security Lead</span>
+<span class="font-mono text-slate-600">18 บัญชี</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Search, Filters, & Controls Container -->
+<div class="bg-white rounded-xl border border-slate-200/80 p-4 space-y-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+<div class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+<!-- Search input -->
+<div class="relative flex-1 min-w-[280px]">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+<input class="w-full pl-9 pr-14 py-2 text-xs text-slate-800 placeholder:text-slate-400 bg-slate-50/70 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 focus:bg-white transition-all" placeholder="ค้นหาด้วย ชื่อ, นามสกุล, อีเมล, รหัสพนักงาน (EMP-xxxx)..." type="text">
+<kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-[10px] font-mono bg-white border border-slate-200 text-slate-400">⌘F</kbd>
+</div>
+<!-- Dropdown Selectors -->
+<div class="flex items-center gap-2 flex-wrap">
+<div class="relative">
+<select class="appearance-none pl-3 pr-8 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:border-slate-300 focus:outline-none focus:border-slate-400 cursor-pointer">
+<option value="">แผนก/ฝ่าย: ทั้งหมด</option>
+<option value="it">ฝ่ายพัฒนาซอฟต์แวร์ &amp; ไอที</option>
+<option value="finance">การเงินและบัญชี</option>
+<option value="sales">การขายและการตลาด</option>
+<option value="hr">ทรัพยากรบุคคล (HR)</option>
+<option value="compliance">ความปลอดภัยและกำกับดูแล</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[16px] pointer-events-none">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none pl-3 pr-8 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:border-slate-300 focus:outline-none focus:border-slate-400 cursor-pointer">
+<option value="">บทบาท: ทั้งหมด</option>
+<option value="super_admin">Super Admin</option>
+<option value="security_lead">Security Lead</option>
+<option value="devops">DevOps Manager</option>
+<option value="editor">Editor</option>
+<option value="staff">Staff / Viewer</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[16px] pointer-events-none">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none pl-3 pr-8 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:border-slate-300 focus:outline-none focus:border-slate-400 cursor-pointer">
+<option value="">สถานะ: ทั้งหมด</option>
+<option value="active">เปิดใช้งาน (Active)</option>
+<option value="pending">รอการยืนยัน (Pending)</option>
+<option value="suspended">ระงับการใช้งาน (Suspended)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[16px] pointer-events-none">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none pl-3 pr-8 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:border-slate-300 focus:outline-none focus:border-slate-400 cursor-pointer">
+<option value="">2FA: ทั้งหมด</option>
+<option value="mfa_enabled">เปิดใช้งาน MFA แล้ว</option>
+<option value="mfa_disabled">ยังไม่เปิดใช้งาน</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[16px] pointer-events-none">expand_more</span>
+</div>
+<button class="p-2 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors" title="ตัวกรองเพิ่มเติม" type="button">
+<span class="material-symbols-outlined text-[18px]">filter_alt</span>
+</button>
+</div>
+</div>
+<!-- Filter Chips Sub-bar -->
+<div class="flex items-center justify-between pt-2 border-t border-slate-100 flex-wrap gap-2 text-xs">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-slate-400 text-[11px]">ตัวกรองปัจจุบัน:</span>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs border border-slate-200/80">
+<span class="">แผนก: ทั้งหมด</span>
+<span class="material-symbols-outlined text-[13px] text-slate-400 hover:text-slate-700 cursor-pointer">close</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs border border-slate-200/80">
+<span class="">2FA: เปิดใช้งาน MFA แล้ว</span>
+<span class="material-symbols-outlined text-[13px] text-slate-400 hover:text-slate-700 cursor-pointer">close</span>
+</div>
+<button class="text-xs text-slate-500 hover:text-slate-900 underline ml-1" type="button">
+              ล้างตัวกรองทั้งหมด
+            </button>
+</div>
+<span class="font-mono text-slate-400 text-[11px]">
+            พบ 1,180 จาก 1,248 ผู้ใช้
+          </span>
+</div>
+<!-- Bulk Action Floating Bar -->
+<div class="hidden flex items-center justify-between p-2.5 px-4 rounded-lg bg-slate-900 text-white transition-all shadow-sm" id="bulk-action-bar">
+<div class="flex items-center gap-4">
+<span class="text-xs flex items-center gap-1.5 font-medium">
+<span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+              เลือกแล้ว <span class="font-mono font-bold text-white" id="selected-count">0</span> บัญชี
+            </span>
+<div class="h-3 w-[1px] bg-slate-700"></div>
+<div class="flex items-center gap-1.5">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">lock_reset</span>
+<span class="">รีเซ็ตรหัสผ่าน</span>
+</button>
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">admin_panel_settings</span>
+<span class="">เปลี่ยนบทบาท</span>
+</button>
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">download</span>
+<span class="">ส่งออกรายการนี้</span>
+</button>
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-rose-950/80 hover:bg-rose-900 text-rose-300 text-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">block</span>
+<span class="">ระงับสิทธิ์ชั่วคราว</span>
+</button>
+</div>
+</div>
+<button class="text-xs text-slate-400 hover:text-white" onclick="deselectAllUsers()" type="button">
+            ยกเลิกการเลือก
+          </button>
+</div>
+</div>
+<!-- Main User Table -->
+<div class="bg-white rounded-xl border border-slate-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse text-xs">
+<thead>
+<tr class="border-b border-slate-200/80 bg-slate-50/70 text-slate-500 font-semibold tracking-wide uppercase select-none text-[11px]">
+<th class="w-10 px-4 py-3 text-center">
+<input class="rounded border-slate-300 text-slate-900 focus:ring-0 cursor-pointer w-3.5 h-3.5" id="select-all" type="checkbox">
+</th>
+<th class="px-4 py-3">ข้อมูลผู้ใช้งาน (Identity)</th>
+<th class="px-4 py-3">รหัสพนักงาน &amp; แผนก</th>
+<th class="px-4 py-3">บทบาทหลัก (Role)</th>
+<th class="px-4 py-3">สถานะบัญชี</th>
+<th class="px-4 py-3">ความปลอดภัย (2FA)</th>
+<th class="px-4 py-3">เข้าใช้งานล่าสุด</th>
+<th class="px-4 py-3 text-right">การจัดการ</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<!-- User 1: Privileged Super Admin -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="px-4 py-3.5 text-center">
+<input class="user-row-checkbox rounded border-slate-300 text-slate-900 focus:ring-0 cursor-pointer w-3.5 h-3.5" type="checkbox">
+</td>
+<td class="px-4 py-3.5">
+<div class="flex items-center gap-3">
+<div class="relative flex-shrink-0">
+<img class="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200" data-alt="Close up corporate portrait photograph of Dr. Kittisak, a senior Thai male executive in his 40s wearing dark tailored blazer and minimal modern glasses, clean studio lighting with slight soft cyan background reflection, high-end professional headshot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBf1wHBT1hOb8ZdvhMHiLeeXTK_9om98znDzvo5II39CP8yCPqHGKdyQVrD-8ceGtVMOC_DaAqJy4fyKZu6wvKOBhFiXMJwF-EPMIhXt-9JpWZGeUa2fEZDZ0kYA1qVa_hu9E0hL4OdtGletZKCJI13OX4CRhOKitPSr9bLNRGD04M1tV-NCBWTj8q3ag23KkPVmY7MlD2GddaB7RVqLzpD4N6iyzO1iIRYylowwFiLFH5M0m70EBI7dw">
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-semibold text-slate-900 truncate">ดร. กิตติศักดิ์ เมธาพาณิชย์</span>
+<span class="material-symbols-outlined text-slate-500 text-[14px]" title="Root Privilege Privileged Account">verified</span>
+</div>
+<span class="text-slate-400 font-mono text-[11px] truncate">kittisak.m@acme-corp.co.th</span>
+</div>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="font-mono text-slate-700 font-medium">EMP-0012</span>
+<span class="text-slate-400 text-[11px]">โครงสร้างพื้นฐาน &amp; สถาปัตยกรรมคลาวด์</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-900 text-white font-medium text-[11px]">
+<span class="material-symbols-outlined text-[13px]">shield</span> Super Admin
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-medium border border-emerald-100">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    ใช้งานอยู่ (Active)
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<div class="inline-flex items-center gap-1.5 text-slate-600 font-medium text-[11px]">
+<span class="material-symbols-outlined text-[15px] text-slate-400">security</span>
+<span class="">FIDO2 / Hardware Key</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="text-slate-700 font-medium">3 นาทีที่แล้ว</span>
+<span class="font-mono text-[11px] text-slate-400">203.144.144.168 (BKK)</span>
+</div>
+</td>
+<td class="px-4 py-3.5 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="แก้ไขสิทธิ์" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="ดูรายละเอียด" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- User 2: Security Lead -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="px-4 py-3.5 text-center">
+<input class="user-row-checkbox rounded border-slate-300 text-slate-900 focus:ring-0 cursor-pointer w-3.5 h-3.5" type="checkbox">
+</td>
+<td class="px-4 py-3.5">
+<div class="flex items-center gap-3">
+<div class="relative flex-shrink-0">
+<img class="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200" data-alt="Editorial portrait of Nichakarn, an Asian female cybersecurity officer in early 30s with sharp styled bob haircut, confident expression, wearing navy blue blazer, ambient corporate technology office background, cinematic crisp lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmTfoopbXOZYSXgYtXSZePVl_AOHC2ZoXO6NOqIt6uTDt7CJdZNKWA-s6WKDssl9NwU7PwwQAMfdLVcHehwJfsMYke3JQQ7Xn9iiyXoyF3WWrYGAlgdOCMoyimQKz9gASOpOL1kZivWFSRls4Y58c5UQCIgmy3eWgQP_oj9xLAEy1002s531rvuCegzTtjy6nsSEQOQguMkJBHbwUHwalGyMUFgzMzEFn5EPU8ueAOfEvHRtZ-x7hf3w">
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-slate-900 truncate">ณิชากานต์ รัตนโชติ</span>
+<span class="text-slate-400 font-mono text-[11px] truncate">nichakarn.r@acme-corp.co.th</span>
+</div>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="font-mono text-slate-700 font-medium">EMP-0318</span>
+<span class="text-slate-400 text-[11px]">ฝ่ายความปลอดภัยสารสนเทศ (InfoSec)</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium text-[11px] border border-slate-200">
+<span class="material-symbols-outlined text-[13px] text-slate-500">admin_panel_settings</span> Security Lead
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-medium border border-emerald-100">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    ใช้งานอยู่ (Active)
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<div class="inline-flex items-center gap-1.5 text-slate-600 font-medium text-[11px]">
+<span class="material-symbols-outlined text-[15px] text-slate-400">lock</span>
+<span class="">Authenticator App</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="text-slate-700 font-medium">18 นาทีที่แล้ว</span>
+<span class="font-mono text-[11px] text-slate-400">49.229.102.84 (TH-VPN)</span>
+</div>
+</td>
+<td class="px-4 py-3.5 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="แก้ไขสิทธิ์" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="ดูรายละเอียด" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- User 3: DevOps Manager -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="px-4 py-3.5 text-center">
+<input class="user-row-checkbox rounded border-slate-300 text-slate-900 focus:ring-0 cursor-pointer w-3.5 h-3.5" type="checkbox">
+</td>
+<td class="px-4 py-3.5">
+<div class="flex items-center gap-3">
+<div class="relative flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 font-semibold text-xs flex items-center justify-center border border-slate-200">
+                        WS
+                      </div>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-slate-900 truncate">วรเมธ สิทธิการุณย์</span>
+<span class="text-slate-400 font-mono text-[11px] truncate">worameth.s@acme-corp.co.th</span>
+</div>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="font-mono text-slate-700 font-medium">EMP-0459</span>
+<span class="text-slate-400 text-[11px]">ฝ่ายวิศวกรรมคลาวด์และ DevOps</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium text-[11px] border border-slate-200">
+<span class="material-symbols-outlined text-[13px] text-slate-500">terminal</span> DevOps Manager
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-medium border border-emerald-100">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    ใช้งานอยู่ (Active)
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<div class="inline-flex items-center gap-1.5 text-slate-600 font-medium text-[11px]">
+<span class="material-symbols-outlined text-[15px] text-slate-400">lock</span>
+<span class="">Authenticator App</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="text-slate-700 font-medium">1 ชั่วโมงที่แล้ว</span>
+<span class="font-mono text-[11px] text-slate-400">171.96.241.11 (BKK)</span>
+</div>
+</td>
+<td class="px-4 py-3.5 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="แก้ไขสิทธิ์" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="ดูรายละเอียด" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- User 4: Finance Lead (Pending) -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="px-4 py-3.5 text-center">
+<input class="user-row-checkbox rounded border-slate-300 text-slate-900 focus:ring-0 cursor-pointer w-3.5 h-3.5" type="checkbox">
+</td>
+<td class="px-4 py-3.5">
+<div class="flex items-center gap-3">
+<div class="relative flex-shrink-0">
+<img class="w-9 h-9 rounded-full object-cover grayscale opacity-80 ring-1 ring-slate-200" data-alt="Modern studio portrait of Chayanist, a Thai female finance director in her late 30s wearing stylish beige knitwear and minimalist gold jewelry, warm natural lighting, confident and friendly executive demeanor." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL8WujvnqXNibLvA7lTvrn25GW7WXSyGH-VVlN4RlVZ8HyBS2VT2LeAibroEjwevUm0Wno79gEkI6bACPLWa5YwcDZAwiV_8sJFQvNf03V6N3c9H1XLC5CyzdptDM8SgxNzAf1k7nBVeJsQXl4-YX40L7QDG1XVEsq2wa35Wit5_jbWrhY5tQcOJbdX0GSE99dAsHI_TR4HloU3v8O605zhKOstxnqYIvMJ9uyiM15ggUUfKeLULZD5w">
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-slate-300 ring-2 ring-white"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-slate-900 truncate">ชญานิษฐ์ วงศ์สว่าง</span>
+<span class="text-slate-400 font-mono text-[11px] truncate">chayanist.w@acme-corp.co.th</span>
+</div>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="font-mono text-slate-700 font-medium">EMP-0721</span>
+<span class="text-slate-400 text-[11px]">ฝ่ายการเงินและการลงทุน</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium text-[11px]">
+<span class="material-symbols-outlined text-[13px]">payments</span> Finance Approver
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-medium border border-slate-200">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                    รอการยืนยัน (Pending)
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<div class="inline-flex items-center gap-1.5 text-slate-400 font-medium text-[11px]">
+<span class="material-symbols-outlined text-[15px]">schedule</span>
+<span class="">รอยืนยันคำเชิญ</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="text-slate-400">ยังไม่เคยเข้าใช้</span>
+<span class="font-mono text-[11px] text-slate-400">ส่งคำเชิญ 2 วันที่แล้ว</span>
+</div>
+</td>
+<td class="px-4 py-3.5 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-[11px] transition-colors" type="button">
+                      ส่งคำเชิญซ้ำ
+                    </button>
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="ดูรายละเอียด" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- User 5: Suspended User -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="px-4 py-3.5 text-center">
+<input class="user-row-checkbox rounded border-slate-300 text-slate-900 focus:ring-0 cursor-pointer w-3.5 h-3.5" type="checkbox">
+</td>
+<td class="px-4 py-3.5">
+<div class="flex items-center gap-3">
+<div class="relative flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-rose-50 text-rose-600 font-semibold text-xs flex items-center justify-center border border-rose-100">
+                        PK
+                      </div>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-medium text-slate-400 line-through truncate">ปริญญา เกียรติไพบูลย์</span>
+<span class="text-slate-400 font-mono text-[11px] truncate">parinya.k@acme-corp.co.th</span>
+</div>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="font-mono text-slate-400 font-medium">EMP-0199</span>
+<span class="text-slate-400 text-[11px]">ฝ่ายจัดซื้อและสัญญา (พ้นสภาพ)</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-50 text-slate-400 font-medium text-[11px] border border-slate-100">
+                    Viewer (จำกัดสิทธิ์)
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 text-[11px] font-medium border border-rose-100">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                    ระงับสิทธิ์ (Suspended)
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<div class="inline-flex items-center gap-1.5 text-rose-600 font-medium text-[11px]">
+<span class="material-symbols-outlined text-[15px] text-rose-500">no_encryption</span>
+<span class="">ยกเลิก Token แล้ว</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="text-slate-400">14 วันที่แล้ว</span>
+<span class="font-mono text-[11px] text-slate-400">Offboarded by Admin</span>
+</div>
+</td>
+<td class="px-4 py-3.5 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-slate-400 hover:text-emerald-600 hover:bg-slate-100 transition-colors" title="ปลดล็อค / คืนสิทธิ์" type="button">
+<span class="material-symbols-outlined text-[18px]">lock_open</span>
+</button>
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="ดูรายละเอียด" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- User 6: HR Lead -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="px-4 py-3.5 text-center">
+<input class="user-row-checkbox rounded border-slate-300 text-slate-900 focus:ring-0 cursor-pointer w-3.5 h-3.5" type="checkbox">
+</td>
+<td class="px-4 py-3.5">
+<div class="flex items-center gap-3">
+<div class="relative flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 font-semibold text-xs flex items-center justify-center border border-slate-200">
+                        SS
+                      </div>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-slate-900 truncate">สโรชา สุวรรณสิทธิ์</span>
+<span class="text-slate-400 font-mono text-[11px] truncate">sarocha.s@acme-corp.co.th</span>
+</div>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="font-mono text-slate-700 font-medium">EMP-0554</span>
+<span class="text-slate-400 text-[11px]">ฝ่ายทรัพยากรบุคคลและสรรหา (HR)</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium text-[11px] border border-slate-200">
+<span class="material-symbols-outlined text-[13px] text-slate-500">group</span> HR Manager
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-medium border border-emerald-100">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    ใช้งานอยู่ (Active)
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<div class="inline-flex items-center gap-1.5 text-slate-600 font-medium text-[11px]">
+<span class="material-symbols-outlined text-[15px] text-slate-400">phonelink_lock</span>
+<span class="">SMS + Authenticator</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="text-slate-700 font-medium">3 ชั่วโมงที่แล้ว</span>
+<span class="font-mono text-[11px] text-slate-400">182.52.201.77 (BKK)</span>
+</div>
+</td>
+<td class="px-4 py-3.5 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="แก้ไขสิทธิ์" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="ดูรายละเอียด" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- User 7: Enterprise Staff -->
+<tr class="hover:bg-slate-50/70 transition-colors group">
+<td class="px-4 py-3.5 text-center">
+<input class="user-row-checkbox rounded border-slate-300 text-slate-900 focus:ring-0 cursor-pointer w-3.5 h-3.5" type="checkbox">
+</td>
+<td class="px-4 py-3.5">
+<div class="flex items-center gap-3">
+<div class="relative flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 font-semibold text-xs flex items-center justify-center border border-slate-200">
+                        SM
+                      </div>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-slate-900 truncate">ศราวุธ มหาสารคาม</span>
+<span class="text-slate-400 font-mono text-[11px] truncate">sarawut.m@acme-corp.co.th</span>
+</div>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="font-mono text-slate-700 font-medium">EMP-0842</span>
+<span class="text-slate-400 text-[11px]">ฝ่ายสนับสนุนลูกค้า (Customer Success)</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium text-[11px]">
+                    Staff / Specialist
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-medium border border-emerald-100">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    ใช้งานอยู่ (Active)
+                  </span>
+</td>
+<td class="px-4 py-3.5">
+<div class="inline-flex items-center gap-1.5 text-slate-600 font-medium text-[11px]">
+<span class="material-symbols-outlined text-[15px] text-slate-400">lock</span>
+<span class="">Authenticator App</span>
+</div>
+</td>
+<td class="px-4 py-3.5">
+<div class="flex flex-col">
+<span class="text-slate-700 font-medium">5 ชั่วโมงที่แล้ว</span>
+<span class="font-mono text-[11px] text-slate-400">125.26.114.90 (CNX)</span>
+</div>
+</td>
+<td class="px-4 py-3.5 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="แก้ไขสิทธิ์" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="ดูรายละเอียด" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Minimalist Pagination & Results Footer -->
+<div class="p-4 bg-slate-50/50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+<div class="flex items-center gap-3">
+<span class="text-slate-500">
+              แสดง <span class="font-medium text-slate-900 font-mono">1 ถึง 10</span> จากทั้งหมด <span class="font-medium text-slate-900 font-mono">1,248</span> รายการ
+            </span>
+<div class="flex items-center gap-1.5">
+<span class="text-slate-400">ต่อหน้า:</span>
+<select class="px-2 py-0.5 rounded bg-white text-slate-700 font-mono text-xs border border-slate-200 focus:outline-none cursor-pointer">
+<option selected="">10</option>
+<option>25</option>
+<option>50</option>
+<option>100</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-1 font-mono">
+<button class="w-8 h-8 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-white flex items-center justify-center transition-colors disabled:opacity-40" disabled="" type="button">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-slate-900 text-white font-medium flex items-center justify-center text-xs" type="button">
+              1
+            </button>
+<button class="w-8 h-8 rounded-lg border border-slate-200 text-slate-600 hover:bg-white hover:text-slate-900 flex items-center justify-center text-xs transition-colors" type="button">
+              2
+            </button>
+<button class="w-8 h-8 rounded-lg border border-slate-200 text-slate-600 hover:bg-white hover:text-slate-900 flex items-center justify-center text-xs transition-colors" type="button">
+              3
+            </button>
+<span class="px-1 text-slate-400">...</span>
+<button class="w-8 h-8 rounded-lg border border-slate-200 text-slate-600 hover:bg-white hover:text-slate-900 flex items-center justify-center text-xs transition-colors" type="button">
+              125
+            </button>
+<button class="w-8 h-8 rounded-lg border border-slate-200 text-slate-600 hover:bg-white hover:text-slate-900 flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+    const selectAll = document.getElementById('select-all');
+    const userCheckboxes = document.querySelectorAll('.user-row-checkbox');
+    const bulkActionBar = document.getElementById('bulk-action-bar');
+    const selectedCountSpan = document.getElementById('selected-count');
+
+    function updateBulkBar() {
+      const checkedBoxes = document.querySelectorAll('.user-row-checkbox:checked');
+      const count = checkedBoxes.length;
+      if (count > 0) {
+        bulkActionBar.classList.remove('hidden');
+        selectedCountSpan.textContent = count;
+      } else {
+        bulkActionBar.classList.add('hidden');
+      }
+    }
+
+    if (selectAll) {
+      selectAll.addEventListener('change', (e) => {
+        userCheckboxes.forEach(cb => {
+          cb.checked = e.target.checked;
+        });
+        updateBulkBar();
+      });
+    }
+
+    userCheckboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        const allChecked = Array.from(userCheckboxes).every(c => c.checked);
+        if (selectAll) selectAll.checked = allChecked;
+        updateBulkBar();
+      });
+    });
+
+    window.deselectAllUsers = function() {
+      if (selectAll) selectAll.checked = false;
+      userCheckboxes.forEach(cb => { cb.checked = false; });
+      updateBulkBar();
+    };
+  </script>
+
+
+</body></html>
