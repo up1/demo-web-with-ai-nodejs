@@ -8,8 +8,8 @@ description: Develop web applications using Node.js, EJS templates, and sqlite d
 2. Design web application's views from User Interface (UI) requirements (HTML with EJS templates)
 3. Implement web application logic using Node.js, EJS templates, and sqlite database follow from the designed views and user requirements 
 4. Following project structure and best practices for web application development, including security, performance, and maintainability
-5. Check user interface with mockup ui with `playwright mcp`
-   * If not matching the mockup, iterate and refine the UI until it aligns with the design
+5. Check user interface of web application with mockup ui with `playwright mcp`
+   * If not matching with the mockup ui, iterate and refine the UI component until it aligns with the design
 
 ## Technologies stack
 
