@@ -27,7 +27,7 @@
 | Scope of Access | Required, must be one of the available options (self only, department, all users) | Please select the scope of access |
 | Employee ID | Required, must follow the format (YYYY-running number) | Please enter a valid employee ID |
 
-## Web element with data_testid that use in playwright
+## Web element with data_testid
 
 | Field | Data Test ID |
 |-------|--------------|
