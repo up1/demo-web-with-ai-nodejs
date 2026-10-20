@@ -1,0 +1,14 @@
+{
+  "name": "report-excel",
+  "version": "1.0.0",
+  "description": "Convert Playwright JSON test results to a styled Excel report",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "report": "node index.js ../test-results.json ./playwright-report.xlsx"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}
